@@ -6,7 +6,7 @@ Inspired by [HTML-webpack-plugin](https://github.com/ampedandwired/html-webpack-
   
 This is a plugin for webpack based on HTML-webpack-plugin,which will enable you to inject js both head and body individually
 
-And what is more,acrodding to our project, I provide blockFile and headBlockFile option,which can directly inject some html code blocks after the start body tag and before the closing body tag
+And what is more,to meet the need of our project, I provide blockFile and headBlockFile option,which can directly inject some html code blocks after the start body tag and before the closing body tag
 
 Installation
 ------------
