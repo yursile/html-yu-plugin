@@ -4,10 +4,9 @@ html-yu-plugin
 
 Inspired by [HTML-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin)
   
-This is a plugin for webpack based on [HTML-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin),which enable you to inject js both head and body individually
+This is a plugin for webpack based on HTML-webpack-plugin,which will enable you to inject js both head and body individually
 
-And what is more,acrodding to our project, i provide a blockFile option,which can directly inject a html code blocks before the closing body tag;
-
+And what is more,acrodding to our project, I provide blockFile and headBlockFile option,which can directly inject some html code blocks after the start body tag and before the closing body tag
 
 Installation
 ------------
@@ -38,7 +37,8 @@ var webpackConfig = {
         template:'./src/view/index.html', 
         inject:true,  //this value must be true
         heads:['response'],  //place the js which wanna be placed inside head tag
-        blockFile:"./src/view/summarize.js" //this file's code will be injected within the body tag;
+        blockFile:"./src/view/statistics.html", //this file's code will be injected within the body tag;
+        headBlockFile:"./src/view/loading.html"  //prepend to the body
     })
   ]
 }
@@ -52,9 +52,16 @@ This will generate a file `index.html` like the following:
     <script src="/webpack/dist/js/response.js"></script>
   </head>
   <body>
-   <script src="/webpack/dist/js/main.js"></script>
-   <script>
-   // such as baidu statics code;
+    <!-- the loading block is injected  -->
+    <div class="loading">
+      <div class="pace"></div>
+    </div>
+    <script src="/webpack/dist/js/main.js"></script>
+
+
+    <!-- here also can be injected with some stuff like statistics  -->
+    <script type="text/javascript">
+      // such as baidu statistics code;
     </script>
   </body>
 </html>

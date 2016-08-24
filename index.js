@@ -7,6 +7,7 @@ var tmpl = require('blueimp-tmpl').tmpl;
 var Promise = require('bluebird');
 
 var BLOCKFILE = "";
+var HEADBLOCKFILE = "";
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin(options) {
@@ -35,6 +36,17 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
             Promise.resolve(self.options.blockFile);
         });
       })
+
+       //generate headBlockFile
+      .then(function(){
+        return self.getHeadBlockFileContent(compilation)
+          .then(function(blockFileContent) {
+            HEADBLOCKFILE = blockFileContent;
+            // Compile and add html to compilation
+            Promise.resolve(self.options.headBlockFile);
+        });
+      })
+
       // Generate the html
       .then(function() {
         var templateParams = {
@@ -150,6 +162,28 @@ HtmlWebpackPlugin.prototype.getBlockFileContent = function(compilation) {
     // If the file could not be read log a error
     .catch(function() {
       return Promise.reject(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + blockFile + '"'));
+    });
+};
+
+HtmlWebpackPlugin.prototype.getHeadBlockFileContent = function(compilation) {
+  var self = this;
+
+  // If  is passed
+  if (!self.options.headBlockFile) {
+    return Promise.resolve(self.options.headBlockFile);
+  }
+
+  var headBlockFile = self.options.headBlockFile;
+  if (!headBlockFile) {
+     return Promise.resolve(self.options.headBlockFile);
+  } else {
+    headBlockFile = path.normalize(headBlockFile);
+  }
+  compilation.fileDependencies.push(headBlockFile);
+  return fs.readFileAsync(headBlockFile, 'utf8')
+    // If the file could not be read log a error
+    .catch(function() {
+      return Promise.reject(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + headBlockFile + '"'));
     });
 };
 
@@ -397,6 +431,15 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   html = html.replace(/(<\/head>)/i, function (match) {
     return head.join('') + match;
   });
+
+  //Append block to the first child element of body
+  if(!!this.options.headBlockFile){
+     html = html.replace(/(<body>)/i, function (match) {
+      return  match + HEADBLOCKFILE;
+    });
+  }
+ 
+
   // Append assets to body element
     html = html.replace(/(<\/body>)/i, function (match) {
       return body.join('') + match;
