@@ -4,7 +4,7 @@ html-yu-plugin
 
 Inspired by [HTML-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin)
   
-This is a plugin for webpack based on [HTML-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin),which could make js locate both head and body individually
+This is a plugin for webpack based on [HTML-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin),which enable you to inject js both head and body individually
 
 
 Installation
