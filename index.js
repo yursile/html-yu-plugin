@@ -5,6 +5,8 @@ var path = require('path');
 var _ = require('lodash');
 var tmpl = require('blueimp-tmpl').tmpl;
 var Promise = require('bluebird');
+
+var BLOCKFILE = "";
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin(options) {
@@ -22,6 +24,16 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         if (self.options.favicon) {
           return self.addFileToAssets(compilation, self.options.favicon, callback);
         }
+      })
+
+       //generate blockFile
+      .then(function(){
+        return self.getBlockFileContent(compilation)
+          .then(function(blockFileContent) {
+            BLOCKFILE = blockFileContent;
+            // Compile and add html to compilation
+            Promise.resolve(self.options.blockFile);
+        });
       })
       // Generate the html
       .then(function() {
@@ -62,6 +74,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
           }
         };
       })
+     
       // Tell the compiler to proceed
       .finally(compileCallback);
   });
@@ -113,6 +126,33 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
     });
 };
 
+
+/**
+ * 
+ * Returns a Promise
+ */
+HtmlWebpackPlugin.prototype.getBlockFileContent = function(compilation) {
+  var self = this;
+
+  // If  is passed
+  if (!self.options.blockFile) {
+    return Promise.resolve(self.options.blockFile);
+  }
+
+  var blockFile = self.options.blockFile;
+  if (!blockFile) {
+     return Promise.resolve(self.options.blockFile);
+  } else {
+    blockFile = path.normalize(blockFile);
+  }
+  compilation.fileDependencies.push(blockFile);
+  return fs.readFileAsync(blockFile, 'utf8')
+    // If the file could not be read log a error
+    .catch(function() {
+      return Promise.reject(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + blockFile + '"'));
+    });
+};
+
 /*
  * Compile the html template and push the result to the compilation assets
  */
@@ -129,6 +169,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   if (this.options.inject) {
     html = this.injectAssetsIntoHtml(html, templateParams);
   }
+
 
   // Minify the html output
   if (this.options.minify) {
@@ -342,6 +383,12 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   } else {
     body = body.concat(scripts);
   }
+
+  // add a html code block into body
+  if(self.options.blockFile){
+    body.push(BLOCKFILE)
+  }
+  
 
   if(!!this.options.heads){
     head = head.concat(headjs);
