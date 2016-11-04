@@ -72,8 +72,11 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
           .then(function(htmlTemplateContent) {
             // Compile and add html to compilation
             return self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
+            
         });
       })
+
+
       // In case anything went wrong let the user know
       .catch(function(err) {
         compilation.errors.push(err);
@@ -210,6 +213,12 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
     var minify = require('html-minifier').minify;
     html = minify(html, this.options.minify);
   }
+
+  if(!!this.options.replaceUrl) {
+    html = this.replaceOnlineUrl(html);
+  }
+
+
 
   compilation.assets[outputFilename] = {
     source: function() {
@@ -477,6 +486,14 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
     return url;
   }
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+};
+
+
+/**
+ * replace online url
+ */
+HtmlWebpackPlugin.prototype.replaceOnlineUrl = function (tmpl) {
+  return tmpl.replace(/\.\//g,this.options.replaceUrl);
 };
 
 

@@ -8,6 +8,7 @@ This is a plugin for webpack based on HTML-webpack-plugin,which will enable you 
 
 And what is more,to meet the need of our project, I provide blockFile and headBlockFile option,which can directly inject some html code blocks after the start body tag and before the closing body tag
 
+And this plugin can also alter the relative url in index.html with specified url
 Installation
 ------------
 Install the plugin with npm:
@@ -34,11 +35,12 @@ var webpackConfig = {
   plugins: [
     new HtmlWebpackPlugin({           
         filename:'/view/index.html',  
-        template:'./src/view/index.html', 
+        template:'src/view/index.html', 
         inject:true,  //this value must be true
         heads:['response'],  //place the js which wanna be placed inside head tag
-        blockFile:"./src/view/statistics.html", //this file's code will be injected within the body tag;
-        headBlockFile:"./src/view/loading.html"  //prepend to the body
+        blockFile:"src/view/statistics.html", //this file's code will be injected within the body tag;
+        headBlockFile:"src/view/loading.html",  //prepend to the body
+        replaceUrl:"http://news.sohu.com/upload/yursile/smg/" //replace "" with the specified url in index.html 
     })
   ]
 }
@@ -49,14 +51,14 @@ This will generate a file `index.html` like the following:
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="/webpack/dist/js/response.js"></script>
+    <script src="http://news.sohu.com/upload/yursile/smg/webpack/dist/js/response.js"></script>
   </head>
   <body>
     <!-- the loading block is injected  -->
     <div class="loading">
       <div class="pace"></div>
     </div>
-    <script src="/webpack/dist/js/main.js"></script>
+    <script src="http://news.sohu.com/upload/yursile/smg/webpack/dist/js/main.js"></script>
 
 
     <!-- here also can be injected with some stuff like statistics  -->
